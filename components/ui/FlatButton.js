@@ -1,53 +1,32 @@
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '../../constants/styles';
 
-function Input({
-  label,
-  keyboardType,
-  secure,
-  onUpdateValue,
-  value,
-  isInvalid,
-}) {
+function FlatButton({ children, onPress }) {
   return (
-    <View style={styles.inputContainer}>
-      <Text style={[styles.label, isInvalid && styles.labelInvalid]}>
-        {label}
-      </Text>
-      <TextInput
-        style={[styles.input, isInvalid && styles.inputInvalid]}
-        autoCapitalize={false}
-        keyboardType={keyboardType}
-        secureTextEntry={secure}
-        onChangeText={onUpdateValue}
-        value={value}
-      />
-    </View>
+    <Pressable
+      style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+      onPress={onPress}
+    >
+      <View>
+        <Text style={styles.buttonText}>{children}</Text>
+      </View>
+    </Pressable>
   );
 }
 
-export default Input;
+export default FlatButton;
 
 const styles = StyleSheet.create({
-  inputContainer: {
-    marginVertical: 8,
+  button: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
-  label: {
-    color: 'white',
-    marginBottom: 4,
+  pressed: {
+    opacity: 0.7,
   },
-  labelInvalid: {
-    color: Colors.error500,
-  },
-  input: {
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    backgroundColor: Colors.primary100,
-    borderRadius: 4,
-    fontSize: 16,
-  },
-  inputInvalid: {
-    backgroundColor: Colors.error100,
+  buttonText: {
+    textAlign: 'center',
+    color: Colors.primary100,
   },
 });

@@ -1,83 +1,100 @@
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import FlatButton from '../ui/FlatButton';
-import AuthForm from './AuthForm';
-import { Colors } from '../../constants/styles';
+import Button from '../ui/Button';
+import Input from './Input';
 
-function AuthContent({ isLogin, onAuthenticate }) {
+function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [enteredConfirmEmail, setEnteredConfirmEmail] = useState('');
+  const [enteredPassword, setEnteredPassword] = useState('');
+  const [enteredConfirmPassword, setEnteredConfirmPassword] = useState('');
 
-  const [credentialsInvalid, setCredentialsInvalid] = useState({
-    email: false,
-    password: false,
-    confirmEmail: false,
-    confirmPassword: false,
-  });
+  const {
+    email: emailIsInvalid,
+    confirmEmail: emailsDontMatch,
+    password: passwordIsInvalid,
+    confirmPassword: passwordsDontMatch,
+  } = credentialsInvalid;
 
-  function switchAuthModeHandler() {
-    // Todo
+  function updateInputValueHandler(inputType, enteredValue) {
+    switch (inputType) {
+      case 'email':
+        setEnteredEmail(enteredValue);
+        break;
+      case 'confirmEmail':
+        setEnteredConfirmEmail(enteredValue);
+        break;
+      case 'password':
+        setEnteredPassword(enteredValue);
+        break;
+      case 'confirmPassword':
+        setEnteredConfirmPassword(enteredValue);
+        break;
+    }
   }
 
-  function submitHandler(credentials) {
-    let { email, confirmEmail, password, confirmPassword } = credentials;
-
-    email = email.trim();
-    password = password.trim();
-
-    const emailIsValid = email.includes('@');
-    const passwordIsValid = password.length > 6;
-    const emailsAreEqual = email === confirmEmail;
-    const passwordsAreEqual = password === confirmPassword;
-
-    if (
-      !emailIsValid ||
-      !passwordIsValid ||
-      (!isLogin && (!emailsAreEqual || !passwordsAreEqual))
-    ) {
-      Alert.alert('Invalid input', 'Please check your entered credentials.');
-      setCredentialsInvalid({
-        email: !emailIsValid,
-        confirmEmail: !emailIsValid || !emailsAreEqual,
-        password: !passwordIsValid,
-        confirmPassword: !passwordIsValid || !passwordsAreEqual,
-      });
-      return;
-    }
-    onAuthenticate({ email, password });
+  function submitHandler() {
+    onSubmit({
+      email: enteredEmail,
+      confirmEmail: enteredConfirmEmail,
+      password: enteredPassword,
+      confirmPassword: enteredConfirmPassword,
+    });
   }
 
   return (
-    <View style={styles.authContent}>
-      <AuthForm
-        isLogin={isLogin}
-        onSubmit={submitHandler}
-        credentialsInvalid={credentialsInvalid}
-      />
-      <View style={styles.buttons}>
-        <FlatButton onPress={switchAuthModeHandler}>
-          {isLogin ? 'Create a new user' : 'Log in instead'}
-        </FlatButton>
+    <View style={styles.form}>
+      <View>
+        <Input
+          label="Email Address"
+          onUpdateValue={updateInputValueHandler.bind(this, 'email')}
+          value={enteredEmail}
+          keyboardType="email-address"
+          isInvalid={emailIsInvalid}
+        />
+        {!isLogin && (
+          <Input
+            label="Confirm Email Address"
+            onUpdateValue={updateInputValueHandler.bind(this, 'confirmEmail')}
+            value={enteredConfirmEmail}
+            keyboardType="email-address"
+            isInvalid={emailsDontMatch}
+          />
+        )}
+        <Input
+          label="Password"
+          onUpdateValue={updateInputValueHandler.bind(this, 'password')}
+          secure
+          value={enteredPassword}
+          isInvalid={passwordIsInvalid}
+        />
+        {!isLogin && (
+          <Input
+            label="Confirm Password"
+            onUpdateValue={updateInputValueHandler.bind(
+              this,
+              'confirmPassword'
+            )}
+            secure
+            value={enteredConfirmPassword}
+            isInvalid={passwordsDontMatch}
+          />
+        )}
+        <View style={styles.buttons}>
+          <Button onPress={submitHandler}>
+            {isLogin ? 'Log In' : 'Sign Up'}
+          </Button>
+        </View>
       </View>
     </View>
   );
 }
 
-export default AuthContent;
+export default AuthForm;
 
 const styles = StyleSheet.create({
-  authContent: {
-    marginTop: 64,
-    marginHorizontal: 32,
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.primary800,
-    elevation: 2,
-    shadowColor: 'black',
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-  },
   buttons: {
-    marginTop: 8,
+    marginTop: 12,
   },
 });
