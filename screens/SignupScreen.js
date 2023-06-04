@@ -14,10 +14,14 @@ function SignupScreen() {
       const token = await createUser(email, password);
       authCtx.authenticate(token);
     } catch (error) {
+      console.log(error)
+
       Alert.alert(
         "Authentication Failed",
         "Could not create user . please check your inputs and try again later"
       );
+      setIsAuthenticating(false);
+
     }
     setIsAuthenticating(false);
   }
